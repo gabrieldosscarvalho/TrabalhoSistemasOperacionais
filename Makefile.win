@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o teste/teste.o Indice/indice.o
-LINKOBJ  = main.o teste/teste.o Indice/indice.o
+OBJ      = main.o nodo/nodo.o
+LINKOBJ  = main.o nodo/nodo.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -g3
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -27,8 +27,5 @@ $(BIN): $(OBJ)
 main.o: main.c
 	$(CC) -c main.c -o main.o $(CFLAGS)
 
-teste/teste.o: teste/teste.c
-	$(CC) -c teste/teste.c -o teste/teste.o $(CFLAGS)
-
-Indice/indice.o: Indice/indice.c
-	$(CC) -c Indice/indice.c -o Indice/indice.o $(CFLAGS)
+nodo/nodo.o: nodo/nodo.c
+	$(CC) -c nodo/nodo.c -o nodo/nodo.o $(CFLAGS)

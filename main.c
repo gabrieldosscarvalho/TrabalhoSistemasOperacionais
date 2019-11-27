@@ -4,9 +4,11 @@
 #include <string.h>
 #include <locale.h>
 #include <time.h>
-#include "teste/teste.h"
-#include "indice/indice.h"
+#include "nodo/nodo.h"
 
+/**
+ * Estrutura Produto
+ */
 struct Produto
 {
 	int Codigo;
@@ -17,81 +19,55 @@ struct Produto
 };
 
 /**
- * Gerar um novo produto na memória
+ * Carregar BD
  */
-struct Produto *gerarProduto()
+struct Produto *carregarBd()
 {
-	struct Produto *_p = (struct Produto*) malloc( sizeof (struct Produto) );
-	struct tm *_aux_data_cadastro;
-  
-  	_p->Codigo = (int)time(NULL); // Timestamp
+	FILE *_arqBd = fopen("db", "r");
 
-	_aux_data_cadastro = localtime(&_p->Codigo);
-
-	sprintf(_p->DataCadastro, "%.4d%.2d%.2d",
-		_aux_data_cadastro->tm_year+1900,
-		_aux_data_cadastro->tm_mon+1,
-		_aux_data_cadastro->tm_mday
-	);
-
-	_p->Ativo = false;
-
-	strcpy(_p->Nome, "");
-
-	_p->Valor = 0.0;
-
-	return _p;
-}
-
-/**
- * Listar os dados de um Produto
- */
-void listarProduto( void *conteudo, int listaVazia )
-{
-	if( listaVazia == 1 ) {
-		printf("\n--- Lista esta vazia ---");
-		return;
-	}
-
-	struct Produto *_p = (struct Produto*) conteudo;
-	
-	printf("\n--Produto");
-	printf("\nCódigo:.............:\t %d",	_p->Codigo);
-	printf("\nData de cadastro:...:\t %.8s",	_p->DataCadastro);
-	printf("\nNome:...............:\t %s",	_p->Nome);
-	printf("\nValor:..............:\t %.2f",	_p->Valor);
-	printf("\nAtivo:..............:\t %s",	_p->Ativo? "[*]": "[]");
-	printf("\n");
-}
-
-/**
- * Persistir cada produto no arquivo
- */
-int persistirIndice( void *conteudo, void *arquivo )
-{
-	FILE *_a = (FILE *) arquivo;
-	printf("\n Arquivo: %p", arquivo);
-	
-	fwrite((struct Produto*) conteudo, sizeof(struct Produto), 1, _a);
-	return 0;
-}
-
-/**
- * Persistir os produtos no arquivo
- */
-void persistir( struct Indice *root )
-{
-	FILE *arqDestino = fopen("indice_teste", "wb");
-
-	if(arqDestino == NULL)
+	if(_arqBd == NULL)
 	{
 		printf("\n::: Erro abrindo arquivo de destino!");
 		exit(EXIT_FAILURE);
 	}
+	
+	int _quantidade_itens = 0;
+	
+	struct Produto _p;
+	while(!feof(_arqBd)) {
+		fread (&_p, sizeof(struct Produto), 1, _arqBd);
 
-	indiceListarGerenciado(root, persistirIndice, arqDestino);
+        _quantidade_itens++;
+    }
+    
+    rewind(_arqBd);
+    
+    struct Produto *_bd = malloc( _quantidade_itens * sizeof(struct Produto) );
+    
+    _quantidade_itens = 0;
+    
+    // Carregar os produtos no vetor
+    while(!feof(_arqBd)) {
+		fread (&_bd[_quantidade_itens], sizeof(struct Produto), 1, _arqBd);
+		
+		printf("\nCodigo: %4d\n", _bd[_quantidade_itens].Codigo);
 
-	fclose(arqDestino);
+		printf("Nome: %s \n", _bd[_quantidade_itens].Nome);
+
+		printf("Valor: %lf \n", _bd[_quantidade_itens].Valor);
+
+		printf("Data Cadastro: %.8s\n", _bd[_quantidade_itens].DataCadastro);
+
+		printf("Ativo: %s %d\n", (_bd[_quantidade_itens].Ativo ? "SIM": "NAO"), _bd[_quantidade_itens].Ativo);
+		
+		_quantidade_itens++;
+    }
+	
+	printf("\nquantidade: %d", _quantidade_itens);
+
+	fclose(_arqBd);
+	
+	return _bd;
 }
 
 /**
@@ -100,29 +76,16 @@ void persistir( struct Indice *root )
 int main(int argc, char *argv[]) 
 {
 	setlocale(LC_ALL,"portuguese");
-
-	// Lista
-	struct Indice *root = indiceGerar();
 	
-	// Item 1
-	struct Indice *item1 = indiceGerar();	
-	struct Produto *p = gerarProduto();	
-	strcpy(p->Nome, "Caneta 1");	
-	item1->conteudo = p;
-	root->prox = item1;
+	struct Produto *bd = carregarBd();
 	
-	// Item 2
-	struct Indice *item2 = indiceGerar();	
-	struct Produto *p2 = gerarProduto();
-	strcpy(p2->Nome, "Lapís");
-	p2->Ativo = true;
-	item2->conteudo = p2;	
-	item1->prox = item2;
+//	if( bd[10] == NULL ) {
+//		printf("\nNAO TEM");
+//	} else {
+//		printf("\nTEM");
+//	}
 	
-	indiceListar(root, listarProduto);
-	
-	// TEMPORARIO
-	persistir( root );
+	printf("\nproduto: %d", bd[9].Codigo);
 
 
 	printf("\n");
